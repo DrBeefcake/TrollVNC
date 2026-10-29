@@ -107,7 +107,7 @@ jobs:
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "16.2"
+          xcode-version: "16.4"
 
       - name: Generate Managed.plist (managed build)
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.is_managed == true }}
@@ -143,6 +143,7 @@ jobs:
       - name: Build package (${{ matrix.scheme }})
         run: |
           source devkit/${{ matrix.scheme }}.sh
+          set -o pipefail
           FINALPACKAGE=1 gmake clean package _THEOS_XCODE_XCPRETTY= 2>&1 | tee build.log
 
       - name: Prepare artifacts
@@ -170,14 +171,14 @@ jobs:
         with:
           name: dsym-${{ matrix.scheme }}
           path: artifacts/dsym-${{ matrix.scheme }}
-          if-no-files-found: warn
+          if-no-files-found: error
 
       - name: Upload package artifacts
         uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.scheme }}
           path: artifacts/packages-${{ matrix.scheme }}
-          if-no-files-found: warn
+          if-no-files-found: error
 
       - name: Upload build diagnostics
         if: always()
