@@ -3657,6 +3657,11 @@ static void setupRfbScreen(int argc, const char *argv[]) {
         // Do nothing; default ANY
     }
 
+    // This dedicated build is USB-only: never expose control on LAN, including IPv6.
+    // usbmux forwarding reaches IPv4 loopback on the paired device.
+    gScreen->listenInterface = htonl(INADDR_LOOPBACK);
+    gScreen->listen6Interface = strdup("::1");
+
     // Event handlers
     gScreen->newClientHook = newClientHook;
 #if DEBUG
